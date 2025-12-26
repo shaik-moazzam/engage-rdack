@@ -1,0 +1,11 @@
+{
+  "main": "server.js",
+  "types": "module",
+  "dependencies": {
+    "express": "^4.21.2",
+    "puppeteer": "^23.11.1",
+    "puppeteer-real-browser": "^1.2.0"
+  },
+  "type": "module",
+  "license": "ISC"
+}
