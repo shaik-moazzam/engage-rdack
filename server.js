@@ -195,7 +195,7 @@ const testBrowser = async () => {
     console.error("Error launching browser:", e);
   } finally {
     if (browser) {
-      //   await browser.close();
+      await browser.close();
       console.log("Browser closed");
     }
   }
