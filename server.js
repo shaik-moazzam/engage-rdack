@@ -1,22 +1,34 @@
 import express from "express";
 import puppeteer from "puppeteer";
-
-import os from "os";
-import path from "path";
+import proxies from "./proxies.js";
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
 
+const getRandomProxy = () => {
+  const randomIndex = Math.floor(Math.random() * proxies.length);
+  const proxy = proxies[randomIndex];
+
+  const [host, port, username, password] = proxy.split(":");
+  return {
+    server: `http://${host}:${port}`,
+    username: username,
+    password: password,
+  };
+};
+
 const getFinalCookies = async (initialUrl) => {
   let browser;
   try {
+    const proxyConfig = getRandomProxy();
     browser = await puppeteer.launch({
       headless: false,
       executablePath:
         "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
       args: [
+        `--proxy-server=${proxyConfig.server}`,
         "--start-maximized",
         "--no-sandbox",
         "--disable-setuid-sandbox",
@@ -57,11 +69,13 @@ const getFinalCookies = async (initialUrl) => {
 async function checkLoginStatusWithPuppeteer(email, password) {
   let browser;
   try {
+    const proxyConfig = getRandomProxy();
     browser = await puppeteer.launch({
       headless: false,
       executablePath:
         "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
       args: [
+        `--proxy-server=${proxyConfig.server}`,
         "--start-maximized",
         "--no-sandbox",
         "--disable-setuid-sandbox",
@@ -152,11 +166,13 @@ app.post("/get-cookies", async (req, res) => {
 const testBrowser = async () => {
   let browser;
   try {
+    const proxyConfig = getRandomProxy();
     browser = await puppeteer.launch({
       headless: false,
       executablePath:
         "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
       args: [
+        `--proxy-server=${proxyConfig.server}`,
         "--start-maximized",
         "--no-sandbox",
         "--disable-setuid-sandbox",
@@ -167,13 +183,19 @@ const testBrowser = async () => {
     });
 
     const page = await browser.newPage();
-    await page.goto("https://example.com", { waitUntil: "networkidle2" });
+    await page.authenticate({
+      username: proxyConfig.username,
+      password: proxyConfig.password,
+    });
+    await page.goto("https://login.followupboss.com/login", {
+      waitUntil: "networkidle2",
+    });
     console.log("Browser launched and navigated to example.com");
   } catch (e) {
     console.error("Error launching browser:", e);
   } finally {
     if (browser) {
-      await browser.close();
+      //   await browser.close();
       console.log("Browser closed");
     }
   }
