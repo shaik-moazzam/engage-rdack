@@ -38,6 +38,10 @@ const getFinalCookies = async (initialUrl) => {
       ],
     });
     const page = await browser.newPage();
+    await page.authenticate({
+      username: proxyConfig.username,
+      password: proxyConfig.password,
+    });
 
     await page.goto(initialUrl, {
       waitUntil: "networkidle2",
@@ -85,6 +89,11 @@ async function checkLoginStatusWithPuppeteer(email, password) {
       ],
     });
     const page = await browser.newPage();
+
+    await page.authenticate({
+      username: proxyConfig.username,
+      password: proxyConfig.password,
+    });
 
     await page.goto("https://login.followupboss.com/login", {
       waitUntil: "networkidle2",
